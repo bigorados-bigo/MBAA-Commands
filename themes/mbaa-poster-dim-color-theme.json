@@ -1,0 +1,52 @@
+{
+  "name": "MBAA Poster (Dim Zeros)",
+  "type": "dark",
+  "colors": {},
+  "tokenColors": [
+    { "scope": "constant.numeric.id.mbaa",         "settings": { "foreground": "#9CCC65", "fontStyle": "bold" } },
+    { "scope": "constant.language.motion.mbaa",    "settings": { "foreground": "#00B3A6", "fontStyle": "bold" } },
+    { "scope": "support.constant.command.mbaa",    "settings": { "foreground": "#00B3A6", "fontStyle": "bold" } },
+    { "scope": "constant.numeric.pattern-id.mbaa", "settings": { "foreground": "#FFC400" } },
+    { "scope": "constant.numeric.meter.mbaa",      "settings": { "foreground": "#435fff" } },
+    { "scope": "variable.other.assist.mbaa",       "settings": { "foreground": "#00E5FF" } },
+    { "scope": "variable.other.projectile.mbaa",   "settings": { "foreground": "#7C4DFF" } },
+    { "scope": "variable.other.dash.mbaa",         "settings": { "foreground": "#FF4081" } },
+
+    { "scope": "constant.numeric.binary.flagset1.bit.a.mbaa", "settings": { "foreground": "#2c4af5", "fontStyle": "bold" } },
+    { "scope": "constant.numeric.binary.flagset1.bit.b.mbaa", "settings": { "foreground": "#FF9800" } },
+    { "scope": "constant.numeric.binary.flagset1.bit.c.mbaa", "settings": { "foreground": "#ff009d" } },
+    { "scope": "constant.numeric.binary.flagset1.bit.d.mbaa", "settings": { "foreground": "#81C784" } },
+    { "scope": "constant.numeric.binary.flagset1.bit.e.mbaa", "settings": { "foreground": "#fa0000" } },
+    { "scope": "constant.numeric.binary.flagset1.bit.f.mbaa", "settings": { "foreground": "#00E5FF" } },
+    { "scope": "constant.numeric.binary.flagset1.bit.g.mbaa", "settings": { "foreground": "#7C4DFF" } },
+    { "scope": "constant.numeric.binary.flagset1.bit.h.mbaa", "settings": { "foreground": "#6aeb00" } },
+
+    { "scope": "constant.numeric.binary.flagset2.bit.i.mbaa", "settings": { "foreground": "#2c4af5", "fontStyle": "bold" } },
+    { "scope": "constant.numeric.binary.flagset2.bit.j.mbaa", "settings": { "foreground": "#FF9800" } },
+    { "scope": "constant.numeric.binary.flagset2.bit.k.mbaa", "settings": { "foreground": "#ff0080" } },
+    { "scope": "constant.numeric.binary.flagset2.bit.l.mbaa", "settings": { "foreground": "#81C784" } },
+    { "scope": "constant.numeric.binary.flagset2.bit.m.mbaa", "settings": { "foreground": "#fa0000" } },
+    { "scope": "constant.numeric.binary.flagset2.bit.n.mbaa", "settings": { "foreground": "#00E5FF" } },
+    { "scope": "constant.numeric.binary.flagset2.bit.o.mbaa", "settings": { "foreground": "#7C4DFF" } },
+    { "scope": "constant.numeric.binary.flagset2.bit.p.mbaa", "settings": { "foreground": "#6aeb00" } },
+
+    // dim colored zeros
+    { "scope": "constant.numeric.binary.flagset1.bit.a.mbaa.zero", "settings": { "foreground": "#b6c7ff" } },
+    { "scope": "constant.numeric.binary.flagset1.bit.b.mbaa.zero", "settings": { "foreground": "#ffd596" } },
+    { "scope": "constant.numeric.binary.flagset1.bit.c.mbaa.zero", "settings": { "foreground": "#fa94c7" } },
+    { "scope": "constant.numeric.binary.flagset1.bit.d.mbaa.zero", "settings": { "foreground": "#A5D6A7" } },
+    { "scope": "constant.numeric.binary.flagset1.bit.e.mbaa.zero", "settings": { "foreground": "#fc8a8a" } },
+    { "scope": "constant.numeric.binary.flagset1.bit.f.mbaa.zero", "settings": { "foreground": "#93effd" } },
+    { "scope": "constant.numeric.binary.flagset1.bit.g.mbaa.zero", "settings": { "foreground": "#b9a6ff" } },
+    { "scope": "constant.numeric.binary.flagset1.bit.h.mbaa.zero", "settings": { "foreground": "#cdf3ae" } },
+
+    { "scope": "constant.numeric.binary.flagset2.bit.i.mbaa.zero", "settings": { "foreground": "#b6c7ff" } },
+    { "scope": "constant.numeric.binary.flagset2.bit.j.mbaa.zero", "settings": { "foreground": "#ffd596" } },
+    { "scope": "constant.numeric.binary.flagset2.bit.k.mbaa.zero", "settings": { "foreground": "#fa94c7" } },
+    { "scope": "constant.numeric.binary.flagset2.bit.l.mbaa.zero", "settings": { "foreground": "#A5D6A7" } },
+    { "scope": "constant.numeric.binary.flagset2.bit.m.mbaa.zero", "settings": { "foreground": "#fc8a8a" } },
+    { "scope": "constant.numeric.binary.flagset2.bit.n.mbaa.zero", "settings": { "foreground": "#93effd" } },
+    { "scope": "constant.numeric.binary.flagset2.bit.o.mbaa.zero", "settings": { "foreground": "#b9a6ff" } },
+    { "scope": "constant.numeric.binary.flagset2.bit.p.mbaa.zero", "settings": { "foreground": "#cdf3ae" } }
+  ]
+}

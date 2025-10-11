@@ -1,0 +1,117 @@
+{
+  "scopeName": "source.mbaa",
+  "name": "Melty Blood Actress Again _c.txt",
+  "patterns": [
+    { "include": "#comment" },
+    { "include": "#section" },
+    { "include": "#kv" },
+    { "include": "#end" },
+    { "include": "#row" },
+    { "include": "#row-command" },
+    { "include": "#numbers" }
+  ],
+  "repository": {
+    "comment": {
+      "name": "comment.line.double-slash.mbaa",
+      "match": "//.*$"
+    },
+    "section": {
+      "name": "entity.name.section.mbaa",
+      "match": "^\\s*\\[[^\\]]+\\]"
+    },
+    "kv": {
+      "begin": "^\\s*([A-Za-z_][A-Za-z0-9_]*)\\s*(=)",
+      "beginCaptures": {
+        "1": { "name": "variable.other.key.mbaa" },
+        "2": { "name": "punctuation.separator.key-value.mbaa" }
+      },
+      "end": "$",
+      "patterns": [
+        { "match": ",", "name": "punctuation.separator.sequence.mbaa" },
+        { "include": "#numbers" }
+      ]
+    },
+    "end": {
+      "name": "keyword.control.end.mbaa",
+      "match": "^\\s*END\\s*$"
+    },
+
+    "row": {
+      "name": "meta.mbaa.row",
+      "match": "^\\s*(\\d+)\\s+(\\S+)\\s+(?:(0)|([12]))(?:(0)|(1))(?:(0)|(1))(?:(0)|(1))(?:(0)|(1))(?:(0)|(1))(?:(0)|(1))(?:(0)|(1))\\s+(?:(0)|(1))(?:(0)|(1))(?:(0)|(1))(?:(0)|(1))(?:(0)|(1))(?:(0)|(1))(?:(0)|(1))(?:(0)|(1))\\s+(\\d+)\\s+(\\d+)(?:\\s+(\\d+)\\s+(\\d+)\\s+(\\d+))?(?=\\s*(?://|$))",
+      "captures": {
+        "1":  { "name": "constant.numeric.id.mbaa" },
+        "2":  { "name": "constant.language.motion.mbaa" },
+
+        "3":  { "name": "constant.numeric.binary.flagset1.bit.a.mbaa.zero" },
+        "4":  { "name": "constant.numeric.binary.flagset1.bit.a.mbaa" },
+
+        "5":  { "name": "constant.numeric.binary.flagset1.bit.b.mbaa.zero" },
+        "6":  { "name": "constant.numeric.binary.flagset1.bit.b.mbaa" },
+
+        "7":  { "name": "constant.numeric.binary.flagset1.bit.c.mbaa.zero" },
+        "8":  { "name": "constant.numeric.binary.flagset1.bit.c.mbaa" },
+
+        "9":  { "name": "constant.numeric.binary.flagset1.bit.d.mbaa.zero" },
+        "10": { "name": "constant.numeric.binary.flagset1.bit.d.mbaa" },
+
+        "11": { "name": "constant.numeric.binary.flagset1.bit.e.mbaa.zero" },
+        "12": { "name": "constant.numeric.binary.flagset1.bit.e.mbaa" },
+
+        "13": { "name": "constant.numeric.binary.flagset1.bit.f.mbaa.zero" },
+        "14": { "name": "constant.numeric.binary.flagset1.bit.f.mbaa" },
+
+        "15": { "name": "constant.numeric.binary.flagset1.bit.g.mbaa.zero" },
+        "16": { "name": "constant.numeric.binary.flagset1.bit.g.mbaa" },
+
+        "17": { "name": "constant.numeric.binary.flagset1.bit.h.mbaa.zero" },
+        "18": { "name": "constant.numeric.binary.flagset1.bit.h.mbaa" },
+
+        "19": { "name": "constant.numeric.binary.flagset2.bit.i.mbaa.zero" },
+        "20": { "name": "constant.numeric.binary.flagset2.bit.i.mbaa" },
+
+        "21": { "name": "constant.numeric.binary.flagset2.bit.j.mbaa.zero" },
+        "22": { "name": "constant.numeric.binary.flagset2.bit.j.mbaa" },
+
+        "23": { "name": "constant.numeric.binary.flagset2.bit.k.mbaa.zero" },
+        "24": { "name": "constant.numeric.binary.flagset2.bit.k.mbaa" },
+
+        "25": { "name": "constant.numeric.binary.flagset2.bit.l.mbaa.zero" },
+        "26": { "name": "constant.numeric.binary.flagset2.bit.l.mbaa" },
+
+        "27": { "name": "constant.numeric.binary.flagset2.bit.m.mbaa.zero" },
+        "28": { "name": "constant.numeric.binary.flagset2.bit.m.mbaa" },
+
+        "29": { "name": "constant.numeric.binary.flagset2.bit.n.mbaa.zero" },
+        "30": { "name": "constant.numeric.binary.flagset2.bit.n.mbaa" },
+
+        "31": { "name": "constant.numeric.binary.flagset2.bit.o.mbaa.zero" },
+        "32": { "name": "constant.numeric.binary.flagset2.bit.o.mbaa" },
+
+        "33": { "name": "constant.numeric.binary.flagset2.bit.p.mbaa.zero" },
+        "34": { "name": "constant.numeric.binary.flagset2.bit.p.mbaa" },
+
+        "35": { "name": "constant.numeric.pattern-id.mbaa" },
+        "36": { "name": "constant.numeric.meter.mbaa" },
+        "37": { "name": "variable.other.assist.mbaa" },
+        "38": { "name": "variable.other.projectile.mbaa" },
+        "39": { "name": "variable.other.dash.mbaa" }
+      }
+    },
+
+    "row-command": {
+      "name": "meta.mbaa.row.command",
+      "match": "^\\s*\\d+\\s+((?:[jJ]\\.)?(?:[0-9Vv]+(?:\\+[0-9Vv]+)*)?\\+?(?:[A-D](?:\\+[A-D])*)|(?:[jJ]\\.)?(?:[0-9Vv]+(?:\\+[0-9Vv]+)*))\\b",
+      "captures": {
+        "1": { "name": "constant.language.motion.mbaa" }
+      }
+    },
+
+    "numbers": {
+      "patterns": [
+        { "name": "constant.numeric.decimal.mbaa", "match": "\\b\\d+\\b" },
+        { "name": "constant.numeric.hex.mbaa", "match": "\\b0x[0-9A-Fa-f]+\\b" }
+      ]
+    }
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "name": "MBAA SeList",
+  "scopeName": "source.mbaa.selist",
+  "patterns": [
+    { "name": "keyword.control.end.mbaa", "match": "^\\s*END\\s*$" },
+
+    {
+      "name": "entity.name.section.selist.mbaa",
+      "match": "^\\s*\\[(SeList)\\]"
+    },
+
+    {
+      "name": "meta.selist.entry.with.comment.mbaa",
+      "match": "^\\s*(\\d{3})\\s*=\\s*([A-Za-z_]\\w*)\\s*//\\s*(.+)$",
+      "captures": {
+        "1": { "name": "constant.numeric.selist.id.mbaa" },
+        "2": { "name": "string.unquoted.selist.filename.mbaa" },
+        "3": { "name": "comment.line.selist.description.mbaa" }
+      }
+    },
+
+    {
+      "name": "meta.selist.entry.simple.mbaa",
+      "match": "^\\s*(\\d{3})\\s*=\\s*([A-Za-z_]\\w*)\\s*$",
+      "captures": {
+        "1": { "name": "constant.numeric.selist.id.mbaa" },
+        "2": { "name": "string.unquoted.selist.filename.mbaa" }
+      }
+    },
+
+    {
+      "name": "meta.selist.voice.detailed.mbaa",
+      "match": "^\\s*(\\d{3})\\s*=\\s*([A-Za-z]+_[A-Za-z]+_)([A-Za-z0-9]+)\\s*//\\s*(.+)$",
+      "captures": {
+        "1": { "name": "constant.numeric.selist.id.mbaa" },
+        "2": { "name": "string.unquoted.selist.voice.prefix.mbaa" },
+        "3": { "name": "string.unquoted.selist.sound.id.mbaa" },
+        "4": { "name": "comment.line.selist.description.mbaa" }
+      }
+    },
+
+    {
+      "name": "meta.selist.voice.simple.mbaa",
+      "match": "^\\s*(\\d{3})\\s*=\\s*([A-Za-z]+_[A-Za-z]+_)([A-Za-z0-9]+)\\s*$",
+      "captures": {
+        "1": { "name": "constant.numeric.selist.id.mbaa" },
+        "2": { "name": "string.unquoted.selist.voice.prefix.mbaa" },
+        "3": { "name": "string.unquoted.selist.sound.id.mbaa" }
+      }
+    },
+
+    {
+      "name": "meta.selist.commented.line.mbaa",
+      "match": "^\\s*//\\s*(\\d{3})\\s*=\\s*([A-Za-z_]\\w*)\\s*//\\s*(.*)$",
+      "captures": {
+        "1": { "name": "constant.numeric.selist.id.mbaa" },
+        "2": { "name": "string.unquoted.selist.filename.mbaa" },
+        "3": { "name": "comment.line.selist.description.mbaa" }
+      }
+    },
+
+    { "name": "comment.line.double-slash.mbaa.selist", "match": "//.*$" },
+
+    {
+      "name": "meta.selist.range.comment.mbaa",
+      "match": "^\\s*//\\s*(\\d{3})\\s*-\\s*(\\d{3})\\s*(.+)$",
+      "captures": {
+        "1": { "name": "constant.numeric.selist.id.mbaa" },
+        "2": { "name": "constant.numeric.selist.id.mbaa" },
+        "3": { "name": "comment.line.selist.description.mbaa" }
+      }
+    }
+  ],
+  "repository": {},
+  "fileTypes": ["txt"]
+}

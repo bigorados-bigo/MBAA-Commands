@@ -1,0 +1,243 @@
+{
+  "name": "MBAA Vectors",
+  "scopeName": "source.mbaa.vector",
+  "patterns": [
+    { "name": "keyword.control.end.mbaa", "match": "^\\s*END\\s*$" },
+
+    {
+      "name": "entity.name.section.mbaa",
+      "match": "^\\s*\\[(VectorList|BoundList_\\d{3}|BoundList_\\d+|BoundSample_\\d+|Sample_\\d{3}|HitStop|Etc)\\]"
+    },
+
+    {
+      "name": "meta.vectorlist.vec.definition.mbaa.vector",
+      "match": "^\\s*(Vec_(\\d{3}))\\s*=\\s*([+-]?\\d+)\\s*,\\s*([+-]?\\d+)\\s*,\\s*([+-]?\\d+)\\s*,\\s*([+-]?\\d+)(?:\\s*//.*)?$",
+      "captures": {
+        "1": { "name": "support.constant.vec.id.mbaa.vector" },
+        "2": { "name": "constant.numeric.vector.base.index.mbaa" },
+        "3": { "name": "constant.numeric.vector.x.mbaa" },
+        "4": { "name": "constant.numeric.vector.y.mbaa" },
+        "5": { "name": "constant.numeric.vector.addx.mbaa" },
+        "6": { "name": "constant.numeric.vector.addy.mbaa" }
+      }
+    },
+
+    {
+      "name": "meta.boundlist.vec.data.mbaa.vector",
+      "match": "^\\s*(Vec\\d{2})\\s*=\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*([+-]?\\d+)\\s*,\\s*([+-]?\\d+)\\s*,\\s*([0]{3})([01])([01])([01])([01])([01])(?=\\s|$)",
+      "captures": {
+        "1": { "name": "support.constant.vec.slot.mbaa.vector" },
+        "2": { "name": "constant.numeric.vector.base.reference.mbaa" },
+        "3": { "name": "constant.numeric.pattern.hit.mbaa" },
+        "4": { "name": "constant.numeric.pattern.guard.mbaa" },
+        "5": { "name": "constant.numeric.time.bounce.mbaa" },
+        "6": { "name": "constant.numeric.time.vectime.mbaa" },
+        "7": { "name": "constant.numeric.binary.vecflag.zero.group.mbaa" },
+        "8": { "name": "constant.numeric.binary.vecflag.bit4.mbaa" },
+        "9": { "name": "constant.numeric.binary.vecflag.bit3.mbaa" },
+        "10": { "name": "constant.numeric.binary.vecflag.bit2.mbaa" },
+        "11": { "name": "constant.numeric.binary.vecflag.bit1.mbaa" },
+        "12": { "name": "constant.numeric.binary.vecflag.bit0.mbaa" }
+      }
+    },
+
+    {
+      "name": "meta.kv.simple.mbaa.vector",
+      "match": "^\\s*([A-Za-z_\\-\\u3040-\\u30FF\\u4E00-\\u9FFF]+)\\s*=\\s*([+-]?\\d+)(?:\\s*//.*)?$",
+      "captures": {
+        "1": { "name": "keyword.other.property.mbaa" },
+        "2": { "name": "constant.numeric.value.mbaa" }
+      }
+    },
+
+    {
+      "name": "meta.kv.vector.sample.mbaa.vector",
+      "match": "^\\s*(HitStand|HitAir|HitCrouch|GuardStand|GuardAir|GuardCrouch)\\s*=\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)(?:\\s*//.*)?$",
+      "captures": {
+        "1": { "name": "keyword.other.property.mbaa" },
+        "2": { "name": "constant.numeric.vector.base.reference.mbaa" },
+        "3": { "name": "constant.numeric.sample.param1.mbaa" },
+        "4": { "name": "constant.numeric.sample.param2.mbaa" }
+      }
+    },
+
+    {
+      "name": "meta.kv.complex.mbaa.vector",
+      "match": "^\\s*([A-Za-z_\\-\\u3040-\\u30FF\\u4E00-\\u9FFF]+)\\s*=\\s*(.+)$",
+      "captures": {
+        "1": { "name": "keyword.other.property.mbaa" },
+        "2": { "name": "string.unquoted.value.mbaa.vector" }
+      }
+    },
+
+    {
+      "name": "meta.vectorlist.entry.mbaa.vector",
+      "match": "^\\s*(Vec_(\\d{3}))\\s*=\\s*([+-]?\\d+)\\s*,\\s*([+-]?\\d+)\\s*,\\s*([+-]?\\d+)\\s*,\\s*([+-]?\\d+)",
+      "captures": {
+        "1": { "name": "support.constant.vec.id.mbaa.vector" },
+        "2": { "name": "constant.numeric.vector.base.index.mbaa" },
+        "3": { "name": "constant.numeric.vector.x.mbaa" },
+        "4": { "name": "constant.numeric.vector.y.mbaa" },
+        "5": { "name": "constant.numeric.vector.addx.mbaa" },
+        "6": { "name": "constant.numeric.vector.addy.mbaa" }
+      }
+    },
+
+    {
+      "name": "meta.vector.definition.header.mbaa.vector", 
+      "match": "^\\s*(\\d+)\\s+([^\\d].*?)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s*(?://.*)?$",
+      "captures": {
+        "1": { "name": "constant.numeric.vector.definition.id.mbaa" },
+        "2": { "name": "string.unquoted.vector.name.mbaa" },
+        "3": { "name": "constant.numeric.vector.count.mbaa" },
+        "4": { "name": "constant.numeric.time.ukemi.mbaa" },
+        "5": { "name": "constant.numeric.priority.mbaa" },
+        "6": { "name": "constant.numeric.priority.ani.mbaa" },
+        "7": { "name": "constant.numeric.ko.check.mbaa" }
+      }
+    },
+
+    {
+      "name": "meta.vector.definition.header.short.mbaa.vector", 
+      "match": "^\\s*(\\d+)\\s+([^\\d].*?)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s*$",
+      "captures": {
+        "1": { "name": "constant.numeric.vector.definition.id.mbaa" },
+        "2": { "name": "string.unquoted.vector.name.mbaa" },
+        "3": { "name": "constant.numeric.vector.count.mbaa" },
+        "4": { "name": "constant.numeric.time.ukemi.mbaa" },
+        "5": { "name": "constant.numeric.priority.mbaa" },
+        "6": { "name": "constant.numeric.priority.ani.mbaa" }
+      }
+    },
+
+    {
+      "name": "meta.vector.data.row.with.comment.mbaa.vector",
+      "match": "^\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+([+-]?\\d+)\\s+([+-]?\\d+)\\s+([0]{3})([01])([01])([01])([01])([01])\\s*//.*$",
+      "captures": {
+        "1": { "name": "constant.numeric.vector.base.reference.mbaa" },
+        "2": { "name": "constant.numeric.pattern.hit.mbaa" },
+        "3": { "name": "constant.numeric.pattern.guard.mbaa" },
+        "4": { "name": "constant.numeric.time.bounce.mbaa" },
+        "5": { "name": "constant.numeric.time.vectime.mbaa" },
+        "6": { "name": "constant.numeric.binary.vecflag.zero.group.mbaa" },
+        "7": { "name": "constant.numeric.binary.vecflag.bit4.mbaa" },
+        "8": { "name": "constant.numeric.binary.vecflag.bit3.mbaa" },
+        "9": { "name": "constant.numeric.binary.vecflag.bit2.mbaa" },
+        "10": { "name": "constant.numeric.binary.vecflag.bit1.mbaa" },
+        "11": { "name": "constant.numeric.binary.vecflag.bit0.mbaa" }
+      }
+    },
+
+    {
+      "name": "meta.vector.data.row.simple.mbaa.vector",
+      "match": "^\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+([+-]?\\d+)\\s+([+-]?\\d+)\\s+([0]{3})([01])([01])([01])([01])([01])\\s*$",
+      "captures": {
+        "1": { "name": "constant.numeric.vector.base.reference.mbaa" },
+        "2": { "name": "constant.numeric.pattern.hit.mbaa" },
+        "3": { "name": "constant.numeric.pattern.guard.mbaa" },
+        "4": { "name": "constant.numeric.time.bounce.mbaa" },
+        "5": { "name": "constant.numeric.time.vectime.mbaa" },
+        "6": { "name": "constant.numeric.binary.vecflag.zero.group.mbaa" },
+        "7": { "name": "constant.numeric.binary.vecflag.bit4.mbaa" },
+        "8": { "name": "constant.numeric.binary.vecflag.bit3.mbaa" },
+        "9": { "name": "constant.numeric.binary.vecflag.bit2.mbaa" },
+        "10": { "name": "constant.numeric.binary.vecflag.bit1.mbaa" },
+        "11": { "name": "constant.numeric.binary.vecflag.bit0.mbaa" }
+      }
+    },
+
+    {
+      "name": "meta.vector.data.row.flexible.mbaa.vector",
+      "match": "^\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+([+-]?\\d+)\\s+(\\d+)\\s+([0]{3})([01])([01])([01])([01])([01])(?=\\s|$)",
+      "captures": {
+        "1": { "name": "constant.numeric.vector.base.reference.mbaa" },
+        "2": { "name": "constant.numeric.pattern.hit.mbaa" },
+        "3": { "name": "constant.numeric.pattern.guard.mbaa" },
+        "4": { "name": "constant.numeric.time.bounce.mbaa" },
+        "5": { "name": "constant.numeric.time.vectime.mbaa" },
+        "6": { "name": "constant.numeric.binary.vecflag.zero.group.mbaa" },
+        "7": { "name": "constant.numeric.binary.vecflag.bit4.mbaa" },
+        "8": { "name": "constant.numeric.binary.vecflag.bit3.mbaa" },
+        "9": { "name": "constant.numeric.binary.vecflag.bit2.mbaa" },
+        "10": { "name": "constant.numeric.binary.vecflag.bit1.mbaa" },
+        "11": { "name": "constant.numeric.binary.vecflag.bit0.mbaa" }
+      }
+    },
+
+    {
+      "name": "meta.vector.data.row.spaceless.mbaa.vector",
+      "match": "^\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+([+-]?\\d+)\\s+(\\d+)\\s+([0]{3})([01])([01])([01])([01])([01])(?=\\s|$)",
+      "captures": {
+        "1": { "name": "constant.numeric.vector.base.reference.mbaa" },
+        "2": { "name": "constant.numeric.pattern.hit.mbaa" },
+        "3": { "name": "constant.numeric.pattern.guard.mbaa" },
+        "4": { "name": "constant.numeric.time.bounce.mbaa" },
+        "5": { "name": "constant.numeric.time.vectime.mbaa" },
+        "6": { "name": "constant.numeric.time.vectime.mbaa" },
+        "7": { "name": "constant.numeric.binary.vecflag.zero.group.mbaa" },
+        "8": { "name": "constant.numeric.binary.vecflag.bit4.mbaa" },
+        "9": { "name": "constant.numeric.binary.vecflag.bit3.mbaa" },
+        "10": { "name": "constant.numeric.binary.vecflag.bit2.mbaa" },
+        "11": { "name": "constant.numeric.binary.vecflag.bit1.mbaa" },
+        "12": { "name": "constant.numeric.binary.vecflag.bit0.mbaa" }
+      }
+    },
+
+    {
+      "name": "meta.vector.row.simple.mbaa.vector",
+      "match": "^\\s*(\\d{1,3})\\s+([+-]?\\d+)\\s+([+-]?\\d+)\\s+([+-]?\\d+)\\s+([+-]?\\d+)(?:\\s*//.*)?$",
+      "captures": {
+        "1": { "name": "constant.numeric.vector.base.index.mbaa" },
+        "2": { "name": "constant.numeric.vector.x.mbaa" },
+        "3": { "name": "constant.numeric.vector.y.mbaa" },
+        "4": { "name": "constant.numeric.vector.addx.mbaa" },
+        "5": { "name": "constant.numeric.vector.addy.mbaa" }
+      }
+    },
+
+    {
+      "name": "meta.bound.vecrow.mbaa.vector",
+      "match": "^\\s*(Vec\\d{2})\\s*=\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*([+-]?\\d+)\\s*,\\s*([+-]?\\d+)\\s*,\\s*([0]{3})([01])([01])([01])([01])([01])",
+      "captures": {
+        "1": { "name": "support.constant.vec.slot.mbaa.vector" },
+        "2": { "name": "constant.numeric.vector.base.reference.mbaa" },
+        "3": { "name": "constant.numeric.pattern.hit.mbaa" },
+        "4": { "name": "constant.numeric.pattern.guard.mbaa" },
+        "5": { "name": "constant.numeric.time.bounce.mbaa" },
+        "6": { "name": "constant.numeric.time.vectime.mbaa" },
+        "7": { "name": "constant.numeric.binary.vecflag.zero.group.mbaa" },
+        "8": { "name": "constant.numeric.binary.vecflag.bit4.mbaa" },
+        "9": { "name": "constant.numeric.binary.vecflag.bit3.mbaa" },
+        "10": { "name": "constant.numeric.binary.vecflag.bit2.mbaa" },
+        "11": { "name": "constant.numeric.binary.vecflag.bit1.mbaa" },
+        "12": { "name": "constant.numeric.binary.vecflag.bit0.mbaa" }
+      }
+    },
+
+    {
+      "name": "meta.hitstop.data.mbaa.vector",
+      "match": "^\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)(?:\\s*//.*)?$",
+      "captures": {
+        "1": { "name": "constant.numeric.hitstop.weak.mbaa" },
+        "2": { "name": "constant.numeric.hitstop.medium.mbaa" },
+        "3": { "name": "constant.numeric.hitstop.strong.mbaa" },
+        "4": { "name": "constant.numeric.hitstop.none.mbaa" },
+        "5": { "name": "constant.numeric.hitstop.special.mbaa" },
+        "6": { "name": "constant.numeric.hitstop.super.mbaa" },
+        "7": { "name": "constant.numeric.hitstop.ultra.mbaa" }
+      }
+    },
+
+    {
+      "name": "meta.screen.edge.vector.mbaa.vector",
+      "match": "^\\s*(\\d+)(?:\\s*//.*)?$",
+      "captures": {
+        "1": { "name": "constant.numeric.screen.edge.vector.mbaa" }
+      }
+    },
+
+    { "name": "comment.line.double-slash.mbaa.vector", "match": "//.*$" }
+  ],
+  "repository": {},
+  "fileTypes": ["txt"]
+}
