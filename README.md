@@ -1,30 +1,57 @@
 
-# MBAA Commands (`*_c.txt`) — VS Code Syntax
+# MBAA Extension Pack 🎮
 
-Syntax highlighting + scopes for **Melty Blood Actress Again** command tables (`*_c.txt`).
-Includes per-section colors (ID, command, two flagsets, pattern ID, meter, variables) and per-bit scopes **A..H** (Flagset 1) and **I..P** (Flagset 2). Optional hover tooltips decode each bit.
+A comprehensive VS Code extension for **Melty Blood Actress Again Current Code** modding and data editing.
 
 ## Features
 
-- Automatic language mode for files matching `*_c.txt`.
-- Command column accepts wide inputs: `236A`, `6+C`, `0V9`, `V+D`, `A+B+C+D`, `41236C`, etc.
-- Two 8-bit flagsets captured **bit-by-bit** for custom coloring:
-  - `constant.numeric.binary.flagset1.bit.a.mbaa … .h`
-  - `constant.numeric.binary.flagset2.bit.i.mbaa … .p`
-- Section scopes for theme rules:
-  - `constant.numeric.id.mbaa`, `constant.language.motion.mbaa`,
-    `constant.numeric.pattern-id.mbaa`, `constant.numeric.meter.mbaa`,
-    `variable.other.assist.mbaa`, `variable.other.projectile.mbaa`,
-    `variable.other.dash.mbaa`.
+### 🎯 Command File Support (`*_c.txt`)
+- Full syntax highlighting for MBAA command table files
+- Color-coded command IDs, motions, and parameters  
+- Per-bit binary flag visualization with individual colors
+- Support for complex inputs: `236A`, `6+C`, `A+B+C+D`, `41236C`, etc.
+
+### 📐 Vector File Support 
+- `vector.txt`, `VectorList.txt`, `VectorSample.txt`
+- Complete syntax highlighting for vector definitions
+- **Individual bit coloring** for binary flags (e.g., `00043210` shows each bit in different colors)
+- Support for vector coordinates, timing, and properties
+
+### 🔊 SeList File Support (`*_SeList.txt`)
+- Syntax highlighting for voice/sound mapping files
+- Color-coded IDs, filenames, and Japanese descriptions
+- Easy identification of voice file references
+
+### 🎨 Built-in Color Themes
+- **MBAA Poster (Dim Zeros)** - Subdued colors for zero bits
+- **MBAA Poster (White Zeros)** - High contrast theme
+
+## Binary Flag Visualization
+
+Binary flags like `00043210` are color-coded bit by bit:
+- **000** (first 3 zeros): Gray
+- **4** (bit 4): Green  
+- **3** (bit 3): Yellow
+- **2** (bit 2): Pink
+- **1** (bit 1): Cyan
+- **0** (bit 0): Red
+
+![Bits Guide](images/HanteiBits.png)
+
+## Installation
+
+1. Download the latest `.vsix` file from [Releases](../../releases)
+2. In VS Code: `Ctrl+Shift+P` → "Extensions: Install from VSIX"
+3. Select the downloaded `.vsix` file
 
 ## Usage
 
-![Bits Guide](https://github.com/bigorados-bigo/MBAA-Commands/blob/main/HanteiBits.png?raw=true)
+The extension automatically activates when you open supported files. Check the status bar for language mode confirmation.
 
-
-Open any `_c.txt`. Status bar should show **MBAA Commands**.
-To force associate:
-
+### Manual Association (if needed):
 ```json
-"files.associations": { "*_c.txt": "mbaa-cmd" }
-```
+"files.associations": { 
+  "*_c.txt": "mbaa-cmd",
+  "*_SeList.txt": "mbaa-selist",
+  "vector*.txt": "mbaa-vector"
+}
