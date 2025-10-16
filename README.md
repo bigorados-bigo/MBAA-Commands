@@ -1,5 +1,5 @@
 
-# MBAA Extension Pack 🎮
+# MBAA Syntax
 
 A comprehensive VS Code extension for **Melty Blood Actress Again Current Code** modding and data editing.
 
