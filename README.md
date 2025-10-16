@@ -28,13 +28,8 @@ A comprehensive VS Code extension for **Melty Blood Actress Again Current Code**
 
 ## Binary Flag Visualization
 
-Binary flags like `00043210` are color-coded bit by bit:
-- **000** (first 3 zeros): Gray
-- **4** (bit 4): Green  
-- **3** (bit 3): Yellow
-- **2** (bit 2): Pink
-- **1** (bit 1): Cyan
-- **0** (bit 0): Red
+Binary flags like `10000101` are color-coded bit by bit:
+
 
 ![Bits Guide](images/HanteiBits.png)
 
