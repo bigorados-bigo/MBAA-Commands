@@ -87,26 +87,35 @@ function validateVectorFile(document: vscode.TextDocument, diagnostics: vscode.D
     const vectorDefinitions = new Map<string, number>(); // Vector ID -> line number
     const vectorReferences = new Map<string, number[]>(); // Vector ID -> line numbers where referenced
     const seenDefinitionIds = new Map<string, number>(); // Definition ID -> line number
+    const boundSectionIds = new Map<string, number>(); // BoundList/Sample IDs per section
     
-    let inVectorListSection = false;
-    let inBoundSection = false;
+    let currentSection = 'main'; // 'main', 'vectorlist', 'boundlist', 'sample'
+    let sectionBoundIds: Map<string, number> = new Map();
     
     for (let lineIndex = 0; lineIndex < document.lineCount; lineIndex++) {
         const line = document.lineAt(lineIndex);
         const text = line.text.trim();
         
-        // Track sections
+        // Track sections and reset section-specific ID tracking
         if (text.match(/^\[VectorList\]/)) {
-            inVectorListSection = true;
-            inBoundSection = false;
+            currentSection = 'vectorlist';
+            sectionBoundIds = new Map();
             continue;
         } else if (text.match(/^\[BoundList_\d+\]/)) {
-            inBoundSection = true;
-            inVectorListSection = false;
+            currentSection = 'boundlist';
+            sectionBoundIds = new Map(); // Reset for each BoundList section
+            continue;
+        } else if (text.match(/^\[BoundSample_\d+\]/)) {
+            currentSection = 'sample';
+            sectionBoundIds = new Map(); // Reset for each Sample section
+            continue;
+        } else if (text.match(/^\[Sample_\d+\]/)) {
+            currentSection = 'sample';
+            sectionBoundIds = new Map(); // Reset for each Sample section
             continue;
         } else if (text.startsWith('[')) {
-            inVectorListSection = false;
-            inBoundSection = false;
+            currentSection = 'other';
+            sectionBoundIds = new Map();
             continue;
         }
         
@@ -115,7 +124,7 @@ function validateVectorFile(document: vscode.TextDocument, diagnostics: vscode.D
             continue;
         }
         
-        if (inVectorListSection) {
+        if (currentSection === 'vectorlist') {
             // Vector definitions: Vec_001 = x, y, addx, addy
             const vecMatch = text.match(/^\s*Vec_(\d{3})\s*=/);
             if (vecMatch) {
@@ -133,15 +142,37 @@ function validateVectorFile(document: vscode.TextDocument, diagnostics: vscode.D
                     vectorDefinitions.set(id, lineIndex);
                 }
             }
-        } else if (inBoundSection) {
-            // Vector references in bound sections: Vec01 = ...
-            const refMatch = text.match(/^\s*Vec(\d{2})\s*=/);
-            if (refMatch) {
-                // This is just slot assignment, not a duplicate check
-                continue;
+        } else if (currentSection === 'boundlist' || currentSection === 'sample') {
+            // Vector slot assignments in bound/sample sections: Vec01 = ... or Vec00 = ...
+            const slotMatch = text.match(/^\s*Vec(\d{2})\s*=/);
+            if (slotMatch) {
+                const slotId = slotMatch[1];
+                
+                if (sectionBoundIds.has(slotId)) {
+                    const firstLine = sectionBoundIds.get(slotId)!;
+                    const diagnostic = new vscode.Diagnostic(
+                        new vscode.Range(lineIndex, 0, lineIndex, slotMatch[0].length),
+                        `Duplicate vector slot "${slotId}" in this section (first used on line ${firstLine + 1})`,
+                        vscode.DiagnosticSeverity.Error
+                    );
+                    diagnosticList.push(diagnostic);
+                } else {
+                    sectionBoundIds.set(slotId, lineIndex);
+                }
+                
+                // Also check if the referenced vector exists (extract base vector reference)
+                const dataMatch = text.match(/^\s*Vec\d{2}\s*=\s*(\d+)/);
+                if (dataMatch) {
+                    const refId = dataMatch[1].padStart(3, '0');
+                    
+                    if (!vectorReferences.has(refId)) {
+                        vectorReferences.set(refId, []);
+                    }
+                    vectorReferences.get(refId)!.push(lineIndex);
+                }
             }
-        } else {
-            // Vector definition headers: ID Name Count Ukemi Priority Ani Ko
+        } else if (currentSection === 'main') {
+            // Vector definition headers in main section: ID Name Count Ukemi Priority Ani Ko
             const defMatch = text.match(/^\s*(\d+)\s+([^\d].*?)\s+\d+\s+\d+\s+\d+\s+\d+(?:\s+\d+)?/);
             if (defMatch) {
                 const id = defMatch[1];
@@ -159,10 +190,10 @@ function validateVectorFile(document: vscode.TextDocument, diagnostics: vscode.D
                 }
             }
             
-            // Vector data rows that reference base vectors
+            // Vector data rows that reference base vectors in main section
             const dataMatch = text.match(/^\s+(\d+)\s+\d+\s+\d+/);
             if (dataMatch) {
-                const refId = dataMatch[1].padStart(3, '0'); // Convert to 3-digit format
+                const refId = dataMatch[1].padStart(3, '0');
                 
                 if (!vectorReferences.has(refId)) {
                     vectorReferences.set(refId, []);
@@ -172,16 +203,18 @@ function validateVectorFile(document: vscode.TextDocument, diagnostics: vscode.D
         }
     }
     
-    // Check for undefined vector references
-    for (const [refId, lineNumbers] of vectorReferences.entries()) {
-        if (!vectorDefinitions.has(refId)) {
-            for (const lineIndex of lineNumbers) {
-                const diagnostic = new vscode.Diagnostic(
-                    new vscode.Range(lineIndex, 0, lineIndex, refId.length),
-                    `Vector reference "${refId}" has no definition in VectorList section`,
-                    vscode.DiagnosticSeverity.Warning
-                );
-                diagnosticList.push(diagnostic);
+    // Check for undefined vector references (only if we have VectorList definitions)
+    if (vectorDefinitions.size > 0) {
+        for (const [refId, lineNumbers] of vectorReferences.entries()) {
+            if (!vectorDefinitions.has(refId)) {
+                for (const lineIndex of lineNumbers) {
+                    const diagnostic = new vscode.Diagnostic(
+                        new vscode.Range(lineIndex, 0, lineIndex, refId.length),
+                        `Vector reference "${refId}" has no definition in VectorList section`,
+                        vscode.DiagnosticSeverity.Warning
+                    );
+                    diagnosticList.push(diagnostic);
+                }
             }
         }
     }
