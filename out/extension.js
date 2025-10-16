@@ -66,11 +66,26 @@ function validateVectorFile(document, diagnostics) {
     const vectorReferences = new Map(); // Vector ID -> line numbers where referenced
     const seenDefinitionIds = new Map(); // Definition ID -> line number
     const boundSectionIds = new Map(); // BoundList/Sample IDs per section
+    const sectionHeaders = new Map(); // Track section header duplicates
+    const simpleVectorIds = new Map(); // Simple vector row IDs in main section
     let currentSection = 'main'; // 'main', 'vectorlist', 'boundlist', 'sample'
     let sectionBoundIds = new Map();
     for (let lineIndex = 0; lineIndex < document.lineCount; lineIndex++) {
         const line = document.lineAt(lineIndex);
         const text = line.text.trim();
+        // Check for section header duplicates
+        const sectionMatch = text.match(/^\[(\w+_\d+)\]$/) || text.match(/^\[(VectorList|HitStop|Etc)\]$/);
+        if (sectionMatch) {
+            const sectionName = sectionMatch[1];
+            if (sectionHeaders.has(sectionName)) {
+                const firstLine = sectionHeaders.get(sectionName);
+                const diagnostic = new vscode.Diagnostic(new vscode.Range(lineIndex, 0, lineIndex, text.length), `Duplicate section header "${sectionName}" (first defined on line ${firstLine + 1})`, vscode.DiagnosticSeverity.Error);
+                diagnosticList.push(diagnostic);
+            }
+            else {
+                sectionHeaders.set(sectionName, lineIndex);
+            }
+        }
         // Track sections and reset section-specific ID tracking
         if (text.match(/^\[VectorList\]/)) {
             currentSection = 'vectorlist';
@@ -152,6 +167,19 @@ function validateVectorFile(document, diagnostics) {
                 }
                 else {
                     seenDefinitionIds.set(id, lineIndex);
+                }
+            }
+            // Simple vector rows in main section: ID x y addx addy (like "0  900 0 -70 0 // 頭弱")
+            const simpleMatch = text.match(/^\s*(\d+)\s+([+-]?\d+)\s+([+-]?\d+)\s+([+-]?\d+)\s+([+-]?\d+)(?:\s*\/\/.*)?$/);
+            if (simpleMatch) {
+                const id = simpleMatch[1];
+                if (simpleVectorIds.has(id)) {
+                    const firstLine = simpleVectorIds.get(id);
+                    const diagnostic = new vscode.Diagnostic(new vscode.Range(lineIndex, 0, lineIndex, id.length), `Duplicate simple vector ID "${id}" (first defined on line ${firstLine + 1})`, vscode.DiagnosticSeverity.Error);
+                    diagnosticList.push(diagnostic);
+                }
+                else {
+                    simpleVectorIds.set(id, lineIndex);
                 }
             }
             // Vector data rows that reference base vectors in main section
