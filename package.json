@@ -1,10 +1,10 @@
 {
   "name": "mbaa-cmd",
-  "displayName": "MBAA _c Syntax",
+  "displayName": "MBAA Extension Pack",
   "license": "MIT",
   "icon": "images/icon.png",
-  "description": "Syntax highlighting for Melty Blood Actress Again _c.txt command tables",
-  "version": "0.0.1",
+  "description": "Complete syntax highlighting and validation for Melty Blood Actress Again modding files",
+  "version": "0.0.3",
   "repository": { "type": "git", "url": "https://github.com/bigorados-bigo/MBAA-Commands" },
   "publisher": "bigo",
   "engines": { "vscode": "^1.104.0" },
