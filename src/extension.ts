@@ -49,7 +49,7 @@ function validateDocument(
 
 function validateCommandFile(document: vscode.TextDocument, diagnostics: vscode.DiagnosticCollection) {
     const diagnosticList: vscode.Diagnostic[] = [];
-    const seenIds = new Map<string, number>(); // ID -> first line number
+    const seenIds = new Map<string, number[]>(); // Normalized ID -> line numbers
     
     for (let lineIndex = 0; lineIndex < document.lineCount; lineIndex++) {
         const line = document.lineAt(lineIndex);
@@ -64,17 +64,29 @@ function validateCommandFile(document: vscode.TextDocument, diagnostics: vscode.
         const match = text.match(/^\s*(\d+)\s+/);
         if (match) {
             const id = match[1];
+            const normalizedId = parseInt(id, 10).toString(); // Normalize: 007, 07, 7 -> "7"
             
-            if (seenIds.has(id)) {
-                const firstLine = seenIds.get(id)!;
-                const diagnostic = new vscode.Diagnostic(
-                    new vscode.Range(lineIndex, 0, lineIndex, id.length),
-                    `Duplicate command ID "${id}" (first defined on line ${firstLine + 1})`,
-                    vscode.DiagnosticSeverity.Error
-                );
-                diagnosticList.push(diagnostic);
-            } else {
-                seenIds.set(id, lineIndex);
+            if (!seenIds.has(normalizedId)) {
+                seenIds.set(normalizedId, []);
+            }
+            seenIds.get(normalizedId)!.push(lineIndex);
+        }
+    }
+    
+    // Create diagnostics for all duplicate IDs
+    for (const [id, lineNumbers] of seenIds.entries()) {
+        if (lineNumbers.length > 1) {
+            for (const lineIndex of lineNumbers) {
+                const line = document.lineAt(lineIndex);
+                const match = line.text.match(/^\s*(\d+)\s+/);
+                if (match) {
+                    const diagnostic = new vscode.Diagnostic(
+                        new vscode.Range(lineIndex, 0, lineIndex, match[1].length),
+                        `Duplicate command ID "${id}" (appears ${lineNumbers.length} times on lines ${lineNumbers.map(n => n + 1).join(', ')})`,
+                        vscode.DiagnosticSeverity.Error
+                    );
+                    diagnosticList.push(diagnostic);
+                }
             }
         }
     }
@@ -84,15 +96,15 @@ function validateCommandFile(document: vscode.TextDocument, diagnostics: vscode.
 
 function validateVectorFile(document: vscode.TextDocument, diagnostics: vscode.DiagnosticCollection) {
     const diagnosticList: vscode.Diagnostic[] = [];
-    const vectorDefinitions = new Map<string, number>(); // Vector ID -> line number
+    const vectorDefinitions = new Map<string, number[]>(); // Vector ID -> line numbers
     const vectorReferences = new Map<string, number[]>(); // Vector ID -> line numbers where referenced
-    const seenDefinitionIds = new Map<string, number>(); // Definition ID -> line number
-    const boundSectionIds = new Map<string, number>(); // BoundList/Sample IDs per section
-    const sectionHeaders = new Map<string, number>(); // Track section header duplicates
-    const simpleVectorIds = new Map<string, number>(); // Simple vector row IDs in main section
+    const seenDefinitionIds = new Map<string, number[]>(); // Definition ID -> line numbers
+    const boundSectionIds = new Map<string, number[]>(); // BoundList/Sample IDs per section
+    const sectionHeaders = new Map<string, number[]>(); // Track section header duplicates
+    const simpleVectorIds = new Map<string, number[]>(); // Simple vector row IDs in main section
     
     let currentSection = 'main'; // 'main', 'vectorlist', 'boundlist', 'sample'
-    let sectionBoundIds: Map<string, number> = new Map();
+    let sectionBoundIds: Map<string, number[]> = new Map();
     
     for (let lineIndex = 0; lineIndex < document.lineCount; lineIndex++) {
         const line = document.lineAt(lineIndex);
@@ -103,17 +115,10 @@ function validateVectorFile(document: vscode.TextDocument, diagnostics: vscode.D
         if (sectionMatch) {
             const sectionName = sectionMatch[1];
             
-            if (sectionHeaders.has(sectionName)) {
-                const firstLine = sectionHeaders.get(sectionName)!;
-                const diagnostic = new vscode.Diagnostic(
-                    new vscode.Range(lineIndex, 0, lineIndex, text.length),
-                    `Duplicate section header "${sectionName}" (first defined on line ${firstLine + 1})`,
-                    vscode.DiagnosticSeverity.Error
-                );
-                diagnosticList.push(diagnostic);
-            } else {
-                sectionHeaders.set(sectionName, lineIndex);
+            if (!sectionHeaders.has(sectionName)) {
+                sectionHeaders.set(sectionName, []);
             }
+            sectionHeaders.get(sectionName)!.push(lineIndex);
         }
         
         // Track sections and reset section-specific ID tracking
@@ -133,14 +138,32 @@ function validateVectorFile(document: vscode.TextDocument, diagnostics: vscode.D
             currentSection = 'sample';
             sectionBoundIds = new Map(); // Reset for each Sample section
             continue;
+        } else if (text.match(/^\[(HitStop|Etc)\]/)) {
+            currentSection = 'ignore'; // Ignore HitStop and Etc sections
+            sectionBoundIds = new Map();
+            continue;
         } else if (text.startsWith('[')) {
             currentSection = 'other';
             sectionBoundIds = new Map();
             continue;
         }
         
-        // Skip comments and empty lines
-        if (text.startsWith('//') || text.length === 0 || text === 'END') {
+        // Handle comments that begin special ignore sections
+        if (text.startsWith('//')) {
+            if (/ヒットストップ|hitstop/i.test(text) || text.includes('画面端反動')) {
+                currentSection = 'ignore';
+                sectionBoundIds = new Map();
+            }
+            continue;
+        }
+
+        // Skip empty lines and END markers
+        if (text.length === 0 || text === 'END') {
+            continue;
+        }
+        
+        // Skip ignored sections
+        if (currentSection === 'ignore') {
             continue;
         }
         
@@ -149,36 +172,24 @@ function validateVectorFile(document: vscode.TextDocument, diagnostics: vscode.D
             const vecMatch = text.match(/^\s*Vec_(\d{3})\s*=/);
             if (vecMatch) {
                 const id = vecMatch[1];
+                const normalizedId = parseInt(id, 10).toString(); // Normalize: 001, 01, 1 -> "1"
                 
-                if (vectorDefinitions.has(id)) {
-                    const firstLine = vectorDefinitions.get(id)!;
-                    const diagnostic = new vscode.Diagnostic(
-                        new vscode.Range(lineIndex, 0, lineIndex, vecMatch[0].length),
-                        `Duplicate vector definition "${id}" (first defined on line ${firstLine + 1})`,
-                        vscode.DiagnosticSeverity.Error
-                    );
-                    diagnosticList.push(diagnostic);
-                } else {
-                    vectorDefinitions.set(id, lineIndex);
+                if (!vectorDefinitions.has(normalizedId)) {
+                    vectorDefinitions.set(normalizedId, []);
                 }
+                vectorDefinitions.get(normalizedId)!.push(lineIndex);
             }
         } else if (currentSection === 'boundlist' || currentSection === 'sample') {
             // Vector slot assignments in bound/sample sections: Vec01 = ... or Vec00 = ...
             const slotMatch = text.match(/^\s*Vec(\d{2})\s*=/);
             if (slotMatch) {
                 const slotId = slotMatch[1];
+                const normalizedSlotId = parseInt(slotId, 10).toString(); // Normalize: 01, 1 -> "1"
                 
-                if (sectionBoundIds.has(slotId)) {
-                    const firstLine = sectionBoundIds.get(slotId)!;
-                    const diagnostic = new vscode.Diagnostic(
-                        new vscode.Range(lineIndex, 0, lineIndex, slotMatch[0].length),
-                        `Duplicate vector slot "${slotId}" in this section (first used on line ${firstLine + 1})`,
-                        vscode.DiagnosticSeverity.Error
-                    );
-                    diagnosticList.push(diagnostic);
-                } else {
-                    sectionBoundIds.set(slotId, lineIndex);
+                if (!sectionBoundIds.has(normalizedSlotId)) {
+                    sectionBoundIds.set(normalizedSlotId, []);
                 }
+                sectionBoundIds.get(normalizedSlotId)!.push(lineIndex);
                 
                 // Also check if the referenced vector exists (extract base vector reference)
                 const dataMatch = text.match(/^\s*Vec\d{2}\s*=\s*(\d+)/);
@@ -196,36 +207,24 @@ function validateVectorFile(document: vscode.TextDocument, diagnostics: vscode.D
             const defMatch = text.match(/^\s*(\d+)\s+([^\d].*?)\s+\d+\s+\d+\s+\d+\s+\d+(?:\s+\d+)?/);
             if (defMatch) {
                 const id = defMatch[1];
+                const normalizedId = parseInt(id, 10).toString(); // Normalize
                 
-                if (seenDefinitionIds.has(id)) {
-                    const firstLine = seenDefinitionIds.get(id)!;
-                    const diagnostic = new vscode.Diagnostic(
-                        new vscode.Range(lineIndex, 0, lineIndex, id.length),
-                        `Duplicate vector definition ID "${id}" (first defined on line ${firstLine + 1})`,
-                        vscode.DiagnosticSeverity.Error
-                    );
-                    diagnosticList.push(diagnostic);
-                } else {
-                    seenDefinitionIds.set(id, lineIndex);
+                if (!seenDefinitionIds.has(normalizedId)) {
+                    seenDefinitionIds.set(normalizedId, []);
                 }
+                seenDefinitionIds.get(normalizedId)!.push(lineIndex);
             }
             
             // Simple vector rows in main section: ID x y addx addy (like "0  900 0 -70 0 // 頭弱")
             const simpleMatch = text.match(/^\s*(\d+)\s+([+-]?\d+)\s+([+-]?\d+)\s+([+-]?\d+)\s+([+-]?\d+)(?:\s*\/\/.*)?$/);
             if (simpleMatch) {
                 const id = simpleMatch[1];
+                const normalizedId = parseInt(id, 10).toString(); // Normalize
                 
-                if (simpleVectorIds.has(id)) {
-                    const firstLine = simpleVectorIds.get(id)!;
-                    const diagnostic = new vscode.Diagnostic(
-                        new vscode.Range(lineIndex, 0, lineIndex, id.length),
-                        `Duplicate simple vector ID "${id}" (first defined on line ${firstLine + 1})`,
-                        vscode.DiagnosticSeverity.Error
-                    );
-                    diagnosticList.push(diagnostic);
-                } else {
-                    simpleVectorIds.set(id, lineIndex);
+                if (!simpleVectorIds.has(normalizedId)) {
+                    simpleVectorIds.set(normalizedId, []);
                 }
+                simpleVectorIds.get(normalizedId)!.push(lineIndex);
             }
             
             // Vector data rows that reference base vectors in main section
@@ -257,12 +256,81 @@ function validateVectorFile(document: vscode.TextDocument, diagnostics: vscode.D
         }
     }
     
+    // Create diagnostics for all duplicate section headers
+    for (const [sectionName, lineNumbers] of sectionHeaders.entries()) {
+        if (lineNumbers.length > 1) {
+            for (const lineIndex of lineNumbers) {
+                const line = document.lineAt(lineIndex);
+                const diagnostic = new vscode.Diagnostic(
+                    new vscode.Range(lineIndex, 0, lineIndex, line.text.trim().length),
+                    `Duplicate section header "${sectionName}" (appears ${lineNumbers.length} times on lines ${lineNumbers.map(n => n + 1).join(', ')})`,
+                    vscode.DiagnosticSeverity.Error
+                );
+                diagnosticList.push(diagnostic);
+            }
+        }
+    }
+    
+    // Create diagnostics for all duplicate vector definitions in VectorList
+    for (const [id, lineNumbers] of vectorDefinitions.entries()) {
+        if (lineNumbers.length > 1) {
+            for (const lineIndex of lineNumbers) {
+                const line = document.lineAt(lineIndex);
+                const vecMatch = line.text.match(/^\s*Vec_(\d{3})\s*=/);
+                if (vecMatch) {
+                    const diagnostic = new vscode.Diagnostic(
+                        new vscode.Range(lineIndex, 0, lineIndex, vecMatch[0].length),
+                        `Duplicate vector definition "${id}" (appears ${lineNumbers.length} times on lines ${lineNumbers.map(n => n + 1).join(', ')})`,
+                        vscode.DiagnosticSeverity.Error
+                    );
+                    diagnosticList.push(diagnostic);
+                }
+            }
+        }
+    }
+    
+    // Create diagnostics for all duplicate definition IDs in main section
+    for (const [id, lineNumbers] of seenDefinitionIds.entries()) {
+        if (lineNumbers.length > 1) {
+            for (const lineIndex of lineNumbers) {
+                const line = document.lineAt(lineIndex);
+                const defMatch = line.text.match(/^\s*(\d+)\s+/);
+                if (defMatch) {
+                    const diagnostic = new vscode.Diagnostic(
+                        new vscode.Range(lineIndex, 0, lineIndex, defMatch[1].length),
+                        `Duplicate vector definition ID "${id}" (appears ${lineNumbers.length} times on lines ${lineNumbers.map(n => n + 1).join(', ')})`,
+                        vscode.DiagnosticSeverity.Error
+                    );
+                    diagnosticList.push(diagnostic);
+                }
+            }
+        }
+    }
+    
+    // Create diagnostics for all duplicate simple vector IDs in main section
+    for (const [id, lineNumbers] of simpleVectorIds.entries()) {
+        if (lineNumbers.length > 1) {
+            for (const lineIndex of lineNumbers) {
+                const line = document.lineAt(lineIndex);
+                const simpleMatch = line.text.match(/^\s*(\d+)\s+/);
+                if (simpleMatch) {
+                    const diagnostic = new vscode.Diagnostic(
+                        new vscode.Range(lineIndex, 0, lineIndex, simpleMatch[1].length),
+                        `Duplicate simple vector ID "${id}" (appears ${lineNumbers.length} times on lines ${lineNumbers.map(n => n + 1).join(', ')})`,
+                        vscode.DiagnosticSeverity.Error
+                    );
+                    diagnosticList.push(diagnostic);
+                }
+            }
+        }
+    }
+    
     diagnostics.set(document.uri, diagnosticList);
 }
 
 function validateSeListFile(document: vscode.TextDocument, diagnostics: vscode.DiagnosticCollection) {
     const diagnosticList: vscode.Diagnostic[] = [];
-    const seenIds = new Map<string, number>(); // ID -> first line number
+    const seenIds = new Map<string, number[]>(); // Normalized ID -> line numbers
     
     for (let lineIndex = 0; lineIndex < document.lineCount; lineIndex++) {
         const line = document.lineAt(lineIndex);
@@ -277,17 +345,29 @@ function validateSeListFile(document: vscode.TextDocument, diagnostics: vscode.D
         const match = text.match(/^\s*(\d{3})\s*=/);
         if (match) {
             const id = match[1];
+            const normalizedId = parseInt(id, 10).toString(); // Normalize: 001, 01, 1 -> "1"
             
-            if (seenIds.has(id)) {
-                const firstLine = seenIds.get(id)!;
-                const diagnostic = new vscode.Diagnostic(
-                    new vscode.Range(lineIndex, 0, lineIndex, id.length),
-                    `Duplicate SeList ID "${id}" (first defined on line ${firstLine + 1})`,
-                    vscode.DiagnosticSeverity.Error
-                );
-                diagnosticList.push(diagnostic);
-            } else {
-                seenIds.set(id, lineIndex);
+            if (!seenIds.has(normalizedId)) {
+                seenIds.set(normalizedId, []);
+            }
+            seenIds.get(normalizedId)!.push(lineIndex);
+        }
+    }
+    
+    // Create diagnostics for all duplicate IDs
+    for (const [id, lineNumbers] of seenIds.entries()) {
+        if (lineNumbers.length > 1) {
+            for (const lineIndex of lineNumbers) {
+                const line = document.lineAt(lineIndex);
+                const match = line.text.match(/^\s*(\d{3})\s*=/);
+                if (match) {
+                    const diagnostic = new vscode.Diagnostic(
+                        new vscode.Range(lineIndex, 0, lineIndex, match[1].length),
+                        `Duplicate SeList ID "${id}" (appears ${lineNumbers.length} times on lines ${lineNumbers.map(n => n + 1).join(', ')})`,
+                        vscode.DiagnosticSeverity.Error
+                    );
+                    diagnosticList.push(diagnostic);
+                }
             }
         }
     }

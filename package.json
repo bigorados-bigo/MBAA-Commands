@@ -4,7 +4,7 @@
   "license": "MIT",
   "icon": "images/icon.png",
   "description": "Complete syntax highlighting and validation for Melty Blood Actress Again modding files",
-  "version": "0.0.3",
+  "version": "0.4.0",
   "repository": { "type": "git", "url": "https://github.com/bigorados-bigo/MBAA-Commands" },
   "publisher": "bigo",
   "engines": { "vscode": "^1.104.0" },
